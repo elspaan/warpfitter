@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Data files
+*.npy
+*.pkl
+*.csv
+*.pdf
+*.png
+*.pt
