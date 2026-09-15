@@ -1,0 +1,1 @@
+All synth cubes have Gaussian moment maps unless otherwise specified.
