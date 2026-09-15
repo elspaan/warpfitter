@@ -22,35 +22,42 @@ import subprocess
 from astropy.io import fits
 
 # Base map: only one entry per clean display name
+# ELS: add target here
+# ps = planarsub
+# i = warpfitter integrated
+# G = gaussian moment maps exoALMA
+# B = bell moment maps exoALMA
 base_disc_name_map = {
-    'mwc758': "MWC 758",
-    'mwc758_wc': "MWC 758",
-    'mwc758v2' : "MWC 758 - v2",
-    'v4046': "V4046 Sgr",
-    'aatau': "AA Tau",
-    'cqtau': "CQ Tau",
-    'hd34282': "HD 34282",
-    'dmtau': "DM Tau",
-    'hd135344': "HD 135344B",
-    'hd143006': "HD 143006",
-    'j1604': "J1604",
-    'j1615': "J1615",
-    'j1842': "J1842",
-    'j1852': "J1852",
-    'lkca15': "LkCa15",
-    'pds66': "PDS 66",
-    'sycha': "SY Cha",
-	'hd34700': "HD 34700",
-	'twhya': "TW Hya",
-	#'synthcube' : "incl30wa5",
-	#'incl30wa5twist' : "incl30wa5twist"
+	'j1604' : "J1604", 
+	'j1604v2-gauss' : 'J1604 - version 2 (G)',
+	'j1604v2-bell' : 'J1604 - version 2 (B)', 
+	'j1604v2-bell-loop' : 'J1604 - version 2 (B, i)', 
+	'mwc758' : "MWC 758", 
+	'mwc758v2' : 'MWC 758 - version 2',
+	'mwc758v2-loop' : 'MWC 758 - version 2 (i)',
+	'hd143006' : "HD 143006",
+	'hd143006v2' : 'HD 143006 - version 2',
+	'hd143006v2-loop' : 'HD 143006 - version 2 (i)',
+	# synthcubes - Gauss moment maps
+	'incl10wa5twist' : "incl10wa5twist",
+	'incl10wa5' : "incl10wa5",
+	'incl10wa5twist-planarsub' : "incl10wa5twist (ps)",
+	'incl10wa5-planarsub' : "incl10wa5 (ps)",
+	'incl30wa5twist' : "incl30wa5twist",
+	'incl30wa5twist-loop' : "incl30wa5twist (i)",
+	'incl30wa5' : "incl30wa5",
+	'incl30wa5twist-planarsub' : "incl30wa5twist (ps)",
+	'incl30wa5-planarsub' : "incl30wa5 (ps)", 
+	'incl50wa5twist' : 'incl50wa5twist', 
+	'incl50wa5twist-planarsub' : 'incl50wa5twist (ps)'
 }
 
+# ELS: commented out
 # 12CO targets with _dbell suffix
-dbell_12co = {"aatau", "hd34282", "dmtau", "j1615", "j1842", "lkca15", "sycha"}
+dbell_12co = {} # {"aatau", "hd34282", "dmtau", "j1615", "j1842", "lkca15", "sycha"}
 
 # 13CO targets with _dbell suffix (corrected)
-dbell_13co = {"aatau", "hd34282", "j1615", "lkca15", "sycha"}  # dmtau and j1842 removed
+dbell_13co = {} #{"aatau", "hd34282", "j1615", "lkca15", "sycha"}  # dmtau and j1842 removed
 
 
 # 12CO targets with lower resolution suffix
@@ -80,8 +87,15 @@ for key, display in base_disc_name_map.items():
     disc_name_map[f"{key}_13co_dbell_b0p30"] = display
     disc_name_map[f"{key}_13co_b0p30"] = display
 
-vmax_dict_12co = {"MWC 758": 0.3, "MWC 758 - v2": 0.4, "V4046 Sgr": 0.1, "AA Tau": 0.3, "CQ Tau": 0.4, "HD 34282": 0.3, "DM Tau": 0.15, "HD 135344B": 0.25, "HD 143006": 0.15, "J1604": 0.075, "J1615": 0.15, "J1842": 0.15, "J1852": 0.1, "LkCa15": 0.25, "PDS 66": 0.1, "SY Cha": 0.3, "HD 34700": 0.7, "TW Hya": 0.01, #"synthcube" : 0.3,
-                  "incl30wa5twist": 0.3}
+# vmax_dict_12co = {"MWC 758": 0.3, "V4046 Sgr": 0.1, "AA Tau": 0.3, "CQ Tau": 0.4, "HD 34282": 0.3, "DM Tau": 0.15, "HD 135344B": 0.25, "HD 143006": 0.15, "J1604": 0.075, "J1615": 0.15, "J1842": 0.15, "J1852": 0.1, "LkCa15": 0.25, "PDS 66": 0.1, "SY Cha": 0.3, "HD 34700": 0.7, "TW Hya": 0.01}
+
+# ELS: add target here; synthcube dict
+vmax_dict_12co = {"MWC 758": 0.3, "HD 143006": 0.15, "J1604": 0.075, "MWC 758 - version 2": 0.3, "MWC 758 - version 2 (i)": 0.3 , "HD 143006 - version 2": 0.15, "HD 143006 - version 2 (i)": 0.15, "J1604 - version 2 (G)": 0.075,  "J1604 - version 2 (B)": 0.075, "J1604 - version 2 (B, i)": 0.075,
+				"incl10wa5twist": 0.3, "incl10wa5": 0.3, "incl10wa5twist (ps)": 0.3, "incl10wa5 (ps)": 0.3, 
+				  "incl30wa5twist": 0.3, "incl30wa5twist (i)": 0.3, "incl30wa5": 0.3, "incl30wa5twist (ps)": 0.3, "incl30wa5 (ps)": 0.3, 
+				  "incl50wa5twist" : 0.3, "incl50wa5twist (ps)" : 0.3}
+
+
 
 vmax_dict_13co = {"MWC 758": 0.2, "V4046 Sgr": 0.1, "AA Tau": 0.3, "CQ Tau": 0.3, "HD 34282": 0.3, "DM Tau": 0.1, "HD 135344B": 0.1, "HD 143006": 0.1, "J1604": 0.05, "J1615": 0.15, "J1842": 0.15, "J1852": 0.1, "LkCa15": 0.25, "PDS 66": 0.1, "SY Cha": 0.3}
 
@@ -145,14 +159,14 @@ comparison_data = {
 
 
 
-double_bell_labels = [
-    disc_name_map[disc] for disc in [
-        'aatau_dbell', 'hd34282_dbell', 'dmtau_dbell',
-        'j1615_dbell', 'j1842_dbell', 'lkca15_dbell',
-        'sycha_dbell', #'synthcube',
-        'incl30wa5twist'
-    ]
-]
+double_bell_labels = [] 
+#     [disc_name_map[disc] for disc in [
+#         #'aatau_dbell', 'hd34282_dbell', 'dmtau_dbell',
+#         #'j1615_dbell', 'j1842_dbell', 'lkca15_dbell',
+#         #'sycha_dbell'
+# 		'incl30wa5twist', 'incl30wa5', 'incl30wa5twist-planarsub', 'incl30wa5-planarsub' # ELS: synthcubes
+#     ]
+# ]
 
 def format_pi(x, _):
 	tick_locs = {
@@ -189,7 +203,7 @@ def plot_velocity_map(dv_grid, radii, phi_highres, meta_params, fname):
 		radii_au = radii
 		unit_label = "native units"
 	"""
-	dvmax = 0.2 # hardcoded, I want to read this from the parfile eventually
+	dvmax = 0.05
 	dv = dvmax / 20.0
 
 	dv_levels = np.arange(-dvmax, dvmax+dv, dv)
@@ -255,7 +269,7 @@ def plot_velocity_map(dv_grid, radii, phi_highres, meta_params, fname):
 
 	ax.set_title(fname)
 	plt.tight_layout()
-	plt.show()
+	#plt.show()
 
 def grid_up(fname_full, phi_highres = np.linspace(-np.pi, np.pi, 257), **kwargs):
 	trunc_rout = kwargs.get('trunc_rout', np.inf)
@@ -356,6 +370,7 @@ def fit_gp_from_warp_model(
 	beam_fwhm_arcsec = meta_params.get("beam_fwhm_arcsec", 0.15)
 	distance_pc = meta_params.get("dist_pc", 100.0)
 	beam_radius_au = beam_fwhm_arcsec * distance_pc
+	#print(beam_radius_au)
 
 
 
@@ -363,6 +378,8 @@ def fit_gp_from_warp_model(
 		iinc = rgrid<clip
 		dv_grid = dv_grid[iinc]
 		rgrid = rgrid[iinc]
+
+
 
 	M_star = meta_params.get("mstar_norm", 1.0)
 	G = 4 * np.pi**2
@@ -377,11 +394,12 @@ def fit_gp_from_warp_model(
 
 	A_list, B_list, A_err, B_err = [], [], [], []
 
-	beam_frac=0.5
+	# ELS: does this increase the mask?
+	beam_frac=2.0 # default: 0.5
 	r0 = 0.0
 
 	for i, r in enumerate(rgrid):
-		if r>=r0+beam_frac*beam_radius_au:
+		if r>=r0+2*beam_frac*beam_radius_au:
 			dv = rot_sign * dv_grid[i]
 			mask = np.abs(dv) < dv_max
 
@@ -392,7 +410,9 @@ def fit_gp_from_warp_model(
 				A_err.append(np.nan)
 				B_err.append(np.nan)
 				continue
-
+			
+			# ELS: adjust beam mask here
+			# set to two beams
 			nbeams = 2.*np.pi*r/beam_radius_au
 
 			nskip =1
@@ -422,6 +442,11 @@ def fit_gp_from_warp_model(
 				B_list.append(np.nan)
 				A_err.append(np.nan)
 				B_err.append(np.nan)
+
+                # I need to write something here that pads the arrays with np.nans, or the arrays don't match in the interpolation
+                # that's what keeps happening when I change my beam_frac - a Value error gets raised.
+                # ask Claude to fix it once I have more tokens agains
+                            
 
 	A_arr, B_arr = np.array(A_list), np.array(B_list)
 	A_err, B_err = np.array(A_err), np.array(B_err)
@@ -497,8 +522,8 @@ def fit_gp_from_warp_model(
 
 	with open("warp_profile.txt", "w") as f:
 		for ir in range(len(r_fit)):
-			f.write(f"{r_fit[ir]} {i_fit[ir]} {pa_fit[ir]}\n")
-	breakpoint()
+			f.write(f"{r_fit[ir]} {i_fit[ir]} {i_err[ir]} {pa_fit[ir]} {pa_err[ir]}\n") #ELS: include errors in the warp_profile.txt
+
 	# Compute ranges
 	i_range = (np.min(i_fit), np.max(i_fit))
 	pa_range = (np.min(pa_fit), np.max(pa_fit))
@@ -669,7 +694,7 @@ def plot_combined_velocity_and_profiles(
 		dv_lim = vmax_dict[discname]
 	else:
 		#print(discname, [key for key in vmax_dict])
-		dv_lim = 0.2 # hardcoded, read in from parfile later
+		dv_lim = 0.05
 	dv = dv_lim / 10.0  # 10 levels
 	levels = np.arange(-dv_lim, dv_lim + dv, dv)
 	levels_resid = np.arange(-dv_lim, dv_lim + dv, dv)
@@ -774,7 +799,7 @@ def plot_combined_velocity_and_profiles(
 		ax.set_aspect('equal')
 		beam_fwhm_arcsec = meta_params.get("beam_fwhm_arcsec", 0.15)
 		distance_pc = meta_params.get("dist_pc", 100.0)
-		beam_radius_au = 2.0 * beam_fwhm_arcsec * distance_pc
+		beam_radius_au = 1.0 * beam_fwhm_arcsec * distance_pc # ELS: I want just one beam
 		beam_circle = Circle((0, 0), radius=beam_radius_au,
 								facecolor='gray', edgecolor='red', alpha=0.95,
 								zorder=10)
@@ -997,7 +1022,7 @@ def plot_combined_velocity_and_profiles(
 	if molecule!='$^{12}$CO':
 		plfname += molecule.translate(str.maketrans('', '', '${}^'))
 	plt.savefig(plfname+'.pdf', bbox_inches='tight', format='pdf')
-	# plt.show()
+	#plt.show()
 
 
 def load_or_grid(fname, **kwargs):
@@ -1282,7 +1307,7 @@ def plot_gp_three_panel_comparison(dv_obs, R, PHI, vphi_fn, vr_fn, vz_fn, incl_r
 	ax2.set_xlabel('Azimuth (deg)')
 
 	plt.tight_layout()
-	plt.show()
+	#plt.show()
 
 def plot_gp_components(posterior_dict, r_eval=None, component_labels=None):
 		
@@ -1315,7 +1340,7 @@ def plot_gp_components(posterior_dict, r_eval=None, component_labels=None):
 	ax[-1].set_xlabel("Radius $r$ [AU]")
 	fig.suptitle("GP Velocity Component Samples", fontsize=14)
 	plt.tight_layout()
-	plt.show()
+	#plt.show()
 
 def permutation_corr(x, y, n_permutations=10000, seed=42):
     rng = np.random.default_rng(seed)
@@ -1761,7 +1786,7 @@ def compare_warp_to_curone(results_dict, disc_name_map,stellar_masses=None, inc_
 		plt.tight_layout()
 		print('Saving ', os.getcwd())
 		plt.savefig('correlations_figure.pdf', bbox_inches='tight', format='pdf')
-		# plt.show()
+		#plt.show()
 
 
 def plot_inclination_vs_pa(results_dict, logspace=False):
@@ -1839,8 +1864,8 @@ def plot_inclination_vs_pa(results_dict, logspace=False):
 		#plt.plot(xsp, xsp, color='k', linestyle='dashed', linewidth=1)
 		#plt.plot(xsp, 0.2*xsp, color='k', linestyle='dotted', linewidth=1)
 		#plt.plot(xsp, 5.0*xsp, color='k', linestyle='dotted', linewidth=1)
-		ax.set_xlim([0.,11.0])
-		ax.set_ylim([0.,16.0])
+		ax.set_xlim([-11.,11.0]) # ELS: limits for the plot
+		ax.set_ylim([-16.,16.0])
 
 	else:
 		ax.set_xscale('log')
@@ -2007,7 +2032,7 @@ def plot_warp_amplitude_comparison(results_12co, results_13co):
 
 	plt.tight_layout()
 	plt.savefig("warp_amplitude_12co_vs_13co.pdf", bbox_inches='tight')
-	plt.show()
+	#plt.show()
 
 def plot_beam_amplitude_comparison(results_nominal, results_b0p30, double_bell_labels=None):
 	import numpy as np
@@ -2071,7 +2096,7 @@ def plot_beam_amplitude_comparison(results_nominal, results_b0p30, double_bell_l
 	cbar.set_label("Inclination $|i_0|$ [deg]")
 	plt.tight_layout()
 	plt.savefig("warp_amplitude_beam_comparison.pdf", bbox_inches='tight')
-	plt.show()
+	#plt.show()
 
 
 def plot_warp_vs_mdot_norm(results_dict, disc_name_map,  inc_dbell=True):
@@ -2150,7 +2175,7 @@ def plot_warp_vs_mdot_norm(results_dict, disc_name_map,  inc_dbell=True):
 
 	plt.tight_layout()
 	plt.savefig('warp_vs_mdot_norm.pdf', bbox_inches='tight')
-	plt.show()
+	#plt.show()
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -2212,7 +2237,7 @@ def plot_warp_comparison(results_dict, rad_unit='au'):
 	axes[1].set_xlim([39.0, 270.0])
 	plt.tight_layout()
 	plt.savefig('warp_coordinates.pdf', bbox_inches='tight', format='pdf')
-	plt.show()
+	#plt.show()
 
 
 
@@ -2308,7 +2333,7 @@ def plot_warp_vs_alphaS(results_dict, disc_name_map, inc_dbell=True):
 
 	plt.tight_layout()
 	plt.savefig('warp_vs_alphaS.pdf', bbox_inches='tight')
-	plt.show()
+	#plt.show()
 
 def plot_beta_max_vs_abs_inclination(results_dict, annotate=True, logy=False):
 	labels, raw_labels, incls, beta_max, beta_max_err = [], [], [], [], []
@@ -2371,7 +2396,7 @@ def plot_beta_max_vs_abs_inclination(results_dict, annotate=True, logy=False):
 
 	plt.tight_layout()
 	plt.savefig("beta_max_vs_abs_inclination.pdf", bbox_inches='tight')
-	plt.show()
+	#plt.show()
 
 def _register_target(target, vmax=0.2):
 	base_disc_name_map.update({target: target})
@@ -2420,6 +2445,7 @@ if __name__=='__main__':
 	#parser.add_argument('--target', choices=['default', 'mwc758', 'v4046', 'both', 'testgrid', 'testaxi'], default='both')
 	parser.add_argument('--target', type=str, default='all', help="Comma-separated list of targets: mwc758,v4046,both,testgrid,testaxi,testheight,default")
 	parser.add_argument('--warp', action='store_true', help='Run warp analysis with GP fit to inclination profile')
+	parser.add_argument('--co12', action='store_true', help='Use 12CO directory versions and filenames')
 	parser.add_argument('--co13', action='store_true', help='Use 13CO directory versions and filenames')
 	parser.add_argument('--clip', type=float, help='Clip without scaling (just in warp analysis for now)')
 	parser.add_argument('--unclip', action='store_true', help='Unclip -- overrides clip')
@@ -2436,6 +2462,7 @@ if __name__=='__main__':
 	args = parser.parse_args()
 
 	target_list = [t.strip().lower() for t in args.target.split(',')]
+	co12_suffix = ''
 	co13_suffix = '_13co' if args.co13 else ''
 
 	def suffix_name(name, co13=args.co13):
@@ -2456,20 +2483,34 @@ if __name__=='__main__':
 				suffix += '_b0p30'
 
 		return f"{name}{suffix}"
-	
+
+	#ELS:  add clip_12co_dict here
+	clip_12co_dict = {'mwc758': 250.0, 'hd143006': 170.0, 'j1604': 250.0}
 	clip_13co_dict = {'mwc758': 170.0, 'v4046': 200.0, 'hd34282': 450.0, 'aatau': 300.0, 'cqtau': 135.0, 'dmtau': 300.,
 			  'hd135344': 180.0, 'hd143006': 140.0, 'j1604': False, 'j1615': 350., 'j1842': 200.0, 'j1852': 170.0, 
 			  'lkca15':False, 'pds66': 70.0, 'sycha': 200.0}
+
+	# ELS: gotta add args.co12 --> means we want to clip these disks to this size
+	def clip_12co(name, co12=args.co12):
+		if co12 and not args.unclip:
+			return clip_12co_dict[name]
+		return False
 
 	def clip_13co(name, co13=args.co13):
 		if co13 and not args.unclip:
 			return clip_13co_dict[name]
 		return False
 
+	# ELS: where we define the target list of disks to plot if we say "all"
+	# ELS: add targets here
 	if 'all' in target_list:
 		#target_list.extend(['mwc758', 'v4046', 'aatau_dbell', 'cqtau', 'hd34282_dbell', 'dmtau', 'hd135344', 'hd143006', 'j1604', 'j1615', 'j1842', 'j1852',  'lkca15', 'pds66' ])
-		target_list.extend(['mwc758', 'mwc758v2', 'v4046', 'aatau', 'cqtau', 'hd34282', 'dmtau', 'hd135344', 'hd143006', 'j1604', 'j1615', 'j1842', 'j1852',  'lkca15', 'pds66', 'sycha', #'synthcube',
-                                    'incl30wa5twist'])
+		#target_list.extend(['mwc758', 'v4046', 'aatau', 'cqtau', 'hd34282', 'dmtau', 'hd135344', 'hd143006', 'j1604', 'j1615', 'j1842', 'j1852',  'lkca15', 'pds66', 'sycha' ])
+		target_list.extend(["mwc758", "hd143006", "j1604", "mwc758v2", "hd143006v2", "hd143006-loop", "j1604v2-gauss", "j1604v2-bell", "j1604v2-bell-loop",
+					  "incl10wa5twist", "incl10wa5", "incl10wa5twist-planarsub", "incl10wa5-planarsub", 
+					  		'incl30wa5twist', 'incl30wa5', 'incl30wa5twist-planarsub', 'incl30wa5-planarsub', 
+					  		"incl50wa5twist", "incl50wa5twist-planarsub"])
+
 
 	
 	targets = []
@@ -2479,18 +2520,19 @@ if __name__=='__main__':
 		with open("parfile.json") as json_file:
 			pars = json.load(json_file)
 
-		best = pars["best_fit"]
+		best = pars["params"]
 		meta = pars["metadata"]
 		discname = meta["disc"]
 		dpcpar = meta["dpc"]
 		inclpar = best["orientation"]["incl"]
 		mstarpar = best["velocity"]["Mstar"]
 		velsignpar = best["velocity"]["vel_sign"]
-		outerbound = 0.95 * best["intensity"]["Rout"]
+		outerbound = 0.95 * best["intensity"]["Rout"] # ELS: change this if I want to change outer disk clip
 		header = fits.getheader(meta["file_data"])
 		bsize = 0.2 * header["BMAJ"] * 3600  # For radial binning
 		chansp = np.abs(header["CDELT3"])  # Assumed in km/s
 
+		# ELS: not relevant for warpfitter vanilla
 		if args.initdiscminer:
 			subprocess.run(
 				f"rm -rf velocity_residuals/azimuthal_velocity_residuals_{discname}",
@@ -2532,39 +2574,6 @@ if __name__=='__main__':
 			)
 		)
 
-		# somewhere near other targets.append calls
-		#label = 'synthcube'  # your unique label; must match your file stem
-		#fname = f'azimuthal_velocity_residuals_{label}.txt'
-
-		#targets.append((
-		#	label,         # label (used for folder and plots)
-		#	fname,         # input filename (inside the same-named folder)
-		#	150.0,         # dist_pc         (distance in pc)
-		#	0.15,          # beam_fwhm_arcsec
-		#	1.0,           # mstar_norm      (M_★ in solar units)
-		#	np.inf,        # R_out_trunc_au  (outer-radius clip for gridding)
-		#	0.08,          # channel_spacing (km/s)
-		#	np.deg2rad(30),# inclination [radians]; sign matters only for sin/cos use
-		#	-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
-		#	False          # clip_13co radius or False
-		#))
-
-		# somewhere near other targets.append calls
-		#label = 'incl30wa5twist'  # your unique label; must match your file stem
-		#fname = f'azimuthal_velocity_residuals_{label}.txt'
-
-		#targets.append((
-		#	label,         # label (used for folder and plots)
-		#	fname,         # input filename (inside the same-named folder)#
-		#	150.0,         # dist_pc         (distance in pc)
-		#	0.15,          # beam_fwhm_arcsec
-		#	1.0,           # mstar_norm      (M_★ in solar units)
-		#	np.inf,        # R_out_trunc_au  (outer-radius clip for gridding)
-		#	0.08,          # channel_spacing (km/s)
-		#	np.deg2rad(30),# inclination [radians]; sign matters only for sin/cos use
-		#	-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
-		#	False          # clip_13co radius or False
-		#))
 		_register_target(discname, vmax=pars["custom"]["vlim"])
 		target_list = [discname]
 
@@ -2700,6 +2709,7 @@ if __name__=='__main__':
 			bsize=0.30
 		targets.append((label, f'azimuthal_velocity_residuals_{label}.txt', 182.0, bsize, 0.81, 540.0, 0.02, -0.884481, -1.0, clip_13co('sycha')))
 
+	# ELS: add target here; appends target to list
 	if 'twhya' in target_list and not args.parfile:
 		label = 'twhya'  # your unique label; must match your file stem
 		fname = f'azimuthal_velocity_residuals_{label}.txt'
@@ -2717,25 +2727,374 @@ if __name__=='__main__':
 			False           # clip_13co radius or False
 		))
 
-	# if 'synthcube' in target_list and not args.parfile:
-	# 		# somewhere near other targets.append calls
-	# 	label = 'synthcube'  # your unique label; must match your file stem
-	# 	fname = f'azimuthal_velocity_residuals_{label}.txt'
+	# ----- ELS: exoALMA version 2 ----------------------------------------------------------------------------
+	# add new exoALMA targets here
+	# Mstar, R_out_trunc_au taken from the best fit params (parfile.json) 
+	# This target does NOT HAVE THE CORRECT VALUES but at least it's in there. The fit needs to be done again
+	if 'mwc758v2' in target_list and not args.parfile:
+		label = 'mwc758v2'
+		discname = label # ELS: only if they're the same also in the up top target dictionary
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
 
-	# 	targets.append((
-	# 		label,         # label (used for folder and plots)
-	# 		fname,         # input filename (inside the same-named folder)
-	# 		150.0,         # dist_pc         (distance in pc)
-	# 		0.15,          # beam_fwhm_arcsec
-	# 		1.0,           # mstar_norm      (M_★ in solar units)
-	# 		np.inf,        # R_out_trunc_au  (outer-radius clip for gridding)
-	# 		0.08,          # channel_spacing (km/s)
-	# 		np.deg2rad(30),# inclination [radians]; sign matters only for sin/cos use
-	# 		-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
-	# 		False          # clip_13co radius or False
-	# 	))
-	# 	_register_target(discname, vmax=pars["custom"]["vlim"])
-	# 	target_list = [discname]
+		targets.append((
+			label,          # label (used for folder and plots)
+			fname,          # input filename (inside the same-named folder)
+			155.9,           # dist_pc         (distance in pc)
+			0.15,           # beam_fwhm_arcsec
+			1.738778,           # mstar_norm      (M_★ in solar units)
+			250,          # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,           # channel_spacing (km/s)
+			-0.297595,# inclination [radians]; sign matters only for sin/cos use
+			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False           # clip_13co radius or False
+		))
+
+	if 'mwc758v2-loop' in target_list and not args.parfile:
+		label = 'mwc758v2-loop'
+		discname = label # ELS: only if they're the same also in the up top target dictionary
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,          # label (used for folder and plots)
+			fname,          # input filename (inside the same-named folder)
+			155.9,           # dist_pc         (distance in pc)
+			0.15,           # beam_fwhm_arcsec
+			2.084179,           # mstar_norm      (M_★ in solar units)
+			250,          # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,           # channel_spacing (km/s)
+			-0.286327,	# inclination [radians]; sign matters only for sin/cos use
+			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False           # clip_13co radius or False
+		))
+
+	# these targets have not been fit yet
+	if 'hd143006v2' in target_list and not args.parfile:
+		label = 'hd143006v2'
+		discname = label # ELS: only if they're the same also in the up top target dictionary
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,          # label (used for folder and plots)
+			fname,          # input filename (inside the same-named folder)
+			167,           # dist_pc         (distance in pc)
+			0.15,           # beam_fwhm_arcsec
+			1.61,           # mstar_norm      (M_★ in solar units)
+			180,          # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,           # channel_spacing (km/s)
+			np.deg2rad(-20),# inclination [radians]; sign matters only for sin/cos use
+			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False           # clip_13co radius or False
+		))
+
+	if 'hd143006v2-loop' in target_list and not args.parfile:
+		label = 'hd143006v2-loop'
+		discname = label # ELS: only if they're the same also in the up top target dictionary
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+	
+		targets.append((
+			label,          # label (used for folder and plots)
+			fname,          # input filename (inside the same-named folder)
+			167,           # dist_pc         (distance in pc)
+			0.15,           # beam_fwhm_arcsec
+			1.61,           # mstar_norm      (M_★ in solar units)
+			180,          # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,           # channel_spacing (km/s)
+			np.deg2rad(-20),# inclination [radians]; sign matters only for sin/cos use
+			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False           # clip_13co radius or False
+		))
+
+	if 'j1604v2-gauss' in target_list and not args.parfile:
+		label = 'j1604v2-gauss'
+		discname = label # ELS: only if they're the same also in the up top target dictionary
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,          # label (used for folder and plots)
+			fname,          # input filename (inside the same-named folder)
+			145,           # dist_pc         (distance in pc)
+			0.15,           # beam_fwhm_arcsec
+			1.29,           # mstar_norm      (M_★ in solar units)
+			270,          # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,           # channel_spacing (km/s)
+			np.deg2rad(6),# inclination [radians]; sign matters only for sin/cos use
+			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False           # clip_13co radius or False
+		))
+
+	if 'j1604v2-bell' in target_list and not args.parfile:
+		label = 'j1604v2-bell'
+		discname = label # ELS: only if they're the same also in the up top target dictionary
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,          # label (used for folder and plots)
+			fname,          # input filename (inside the same-named folder)
+			145,           # dist_pc         (distance in pc)
+			0.15,           # beam_fwhm_arcsec
+			1.29,           # mstar_norm      (M_★ in solar units)
+			270,          # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,           # channel_spacing (km/s)
+			np.deg2rad(6),# inclination [radians]; sign matters only for sin/cos use
+			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False           # clip_13co radius or False
+		))
+
+	if 'j1604v2-bell-loop' in target_list and not args.parfile:
+		label = 'j1604v2-bell-loop'
+		discname = label # ELS: only if they're the same also in the up top target dictionary
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,          # label (used for folder and plots)
+			fname,          # input filename (inside the same-named folder)
+			145,           # dist_pc         (distance in pc)
+			0.15,           # beam_fwhm_arcsec
+			1.29,           # mstar_norm      (M_★ in solar units)
+			270,          # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,           # channel_spacing (km/s)
+			np.deg2rad(6),# inclination [radians]; sign matters only for sin/cos use
+			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False           # clip_13co radius or False
+		))
+	# ----- ELS: synthcube targets ----------------------------------------------------------------------------
+	# Mstar, R_out_trunc_au taken from the best fit params (parfile.json) - no I clipped them at 250 AU
+	# channel spacing of 0.08 km/s confirmed with Lina's *submitted* paper
+	# synthcube 1
+	if 'incl10wa5twist' in target_list and not args.parfile:
+		label = 'incl10wa5twist'
+		discname = label # ELS: only if they're the same also in the up top target dictionary
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,         # label (used for folder and plots)
+			fname,         # input filename (inside the same-named folder)
+			150.0,         # dist_pc         (distance in pc)
+			0.15,          # beam_fwhm_arcsec
+			1.568141,           # mstar_norm      (M_★ in solar units)
+			250.,        # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,         # channel_spacing (km/s)
+			np.deg2rad(10),# inclination [radians]; sign matters only for sin/cos use
+			-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False          # clip_13co radius or False
+		))
+
+		# ELS: what happens now?
+		_register_target(discname, vmax=0.3)
+
+	# synthcube 2
+	if 'incl10wa5' in target_list and not args.parfile:
+		label = 'incl10wa5'
+		discname = label
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,         # label (used for folder and plots)
+			fname,         # input filename (inside the same-named folder)
+			150.0,         # dist_pc         (distance in pc)
+			0.15,          # beam_fwhm_arcsec
+			1.104101,           # mstar_norm      (M_★ in solar units)
+			250.,        # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,          # channel_spacing (km/s)
+			np.deg2rad(-10),# inclination [radians]; sign matters only for sin/cos use
+			-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False          # clip_13co radius or False
+		))
+		_register_target(discname, vmax=0.3)
+
+
+	# synthcube 3
+	if 'incl10wa5twist-planarsub' in target_list and not args.parfile:
+		label = 'incl10wa5twist-planarsub'
+		discname = label
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,         # label (used for folder and plots)
+			fname,         # input filename (inside the same-named folder)
+			150.0,         # dist_pc         (distance in pc)
+			0.15,          # beam_fwhm_arcsec
+			0.956359,           # mstar_norm      (M_★ in solar units)
+			250,        # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,          # channel_spacing (km/s)
+			np.deg2rad(-10),# inclination [radians]; sign matters only for sin/cos use
+			-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False          # clip_13co radius or False
+		))
+		_register_target(discname, vmax=0.3)
+
+
+	# synthcube 4
+	if 'incl10wa5-planarsub' in target_list and not args.parfile:
+		label = 'incl10wa5-planarsub'
+		discname = label
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,         # label (used for folder and plots)
+			fname,         # input filename (inside the same-named folder)
+			150.0,         # dist_pc         (distance in pc)
+			0.15,          # beam_fwhm_arcsec
+			1.104101,           # mstar_norm      (M_★ in solar units)
+			250.,        # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,          # channel_spacing (km/s)
+			np.deg2rad(-10),# inclination [radians]; sign matters only for sin/cos use
+			-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False          # clip_13co radius or False
+		))
+		_register_target(discname, vmax=0.3)
+
+
+	# synthcube 5
+	if 'incl30wa5twist' in target_list and not args.parfile:
+		label = 'incl30wa5twist'
+		discname = label
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,         # label (used for folder and plots)
+			fname,         # input filename (inside the same-named folder)
+			150.0,         # dist_pc         (distance in pc)
+			0.15,          # beam_fwhm_arcsec
+			1.097637,           # mstar_norm      (M_★ in solar units)
+			250.,        # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,          # channel_spacing (km/s)
+			np.deg2rad(-30),# inclination [radians]; sign matters only for sin/cos use
+			-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False          # clip_13co radius or False
+		))
+		_register_target(discname, vmax=0.3)
+
+
+	# synthcube 6
+	if 'incl30wa5' in target_list and not args.parfile:
+		label = 'incl30wa5'
+		discname = label
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,         # label (used for folder and plots)
+			fname,         # input filename (inside the same-named folder)
+			150.0,         # dist_pc         (distance in pc)
+			0.15,          # beam_fwhm_arcsec
+			1.069792,           # mstar_norm      (M_★ in solar units)
+			250.,        # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,          # channel_spacing (km/s)
+			np.deg2rad(-30),# inclination [radians]; sign matters only for sin/cos use
+			-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False          # clip_13co radius or False
+		))
+		_register_target(discname, vmax=0.3)
+
+
+	# synthcube 7
+	if 'incl30wa5twist-planarsub' in target_list and not args.parfile:
+		label = 'incl30wa5twist-planarsub'
+		discname = label
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,         # label (used for folder and plots)
+			fname,         # input filename (inside the same-named folder)
+			150.0,         # dist_pc         (distance in pc)
+			0.15,          # beam_fwhm_arcsec
+			1.063501,           # mstar_norm      (M_★ in solar units)
+			250.,        # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,          # channel_spacing (km/s)
+			np.deg2rad(-30),# inclination [radians]; sign matters only for sin/cos use
+			-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False          # clip_13co radius or False
+		))
+		_register_target(discname, vmax=0.3)
+
+
+	# synthcube 8
+	if 'incl30wa5-planarsub' in target_list and not args.parfile:
+		label = 'incl30wa5-planarsub'
+		discname = label
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,         # label (used for folder and plots)
+			fname,         # input filename (inside the same-named folder)
+			150.0,         # dist_pc         (distance in pc)
+			0.15,          # beam_fwhm_arcsec
+			1.063501,           # mstar_norm      (M_★ in solar units)
+			250.,        # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,          # channel_spacing (km/s)
+			np.deg2rad(-30),# inclination [radians]; sign matters only for sin/cos use
+			-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False          # clip_13co radius or False
+		))
+		_register_target(discname, vmax=0.3)
+
+
+	if 'incl30wa5twist-loop' in target_list and not args.parfile:
+		label = 'incl30wa5twist-loop'
+		discname = label
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,         # label (used for folder and plots)
+			fname,         # input filename (inside the same-named folder)
+			150.0,         # dist_pc         (distance in pc)
+			0.15,          # beam_fwhm_arcsec
+			1.212259,           # mstar_norm      (M_★ in solar units)
+			250.,        # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,          # channel_spacing (km/s)
+			np.deg2rad(-30),# inclination [radians]; sign matters only for sin/cos use
+			-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False          # clip_13co radius or False
+		))
+		_register_target(discname, vmax=0.3)
+
+
+
+
+	# synthcube 9
+	if 'incl50wa5twist' in target_list and not args.parfile:
+		label = 'incl50wa5twist'
+		discname = label
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,         # label (used for folder and plots)
+			fname,         # input filename (inside the same-named folder)
+			150.0,         # dist_pc         (distance in pc)
+			0.15,          # beam_fwhm_arcsec
+			1.049244,           # mstar_norm      (M_★ in solar units)
+			253.863006,        # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,          # channel_spacing (km/s)
+			np.deg2rad(-50),# inclination [radians]; sign matters only for sin/cos use
+			-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False          # clip_13co radius or False
+		))
+		_register_target(discname, vmax=0.3)
+
+
+	# synthcube 10
+	if 'incl50wa5twist-planarsub' in target_list and not args.parfile:
+		label = 'incl50wa5twist-planarsub'
+		discname = label
+		fname = f'azimuthal_velocity_residuals_{label}.txt'
+
+		targets.append((
+			label,         # label (used for folder and plots)
+			fname,         # input filename (inside the same-named folder)
+			150.0,         # dist_pc         (distance in pc)
+			0.15,          # beam_fwhm_arcsec
+			1.049244,           # mstar_norm      (M_★ in solar units)
+			253.863006,        # R_out_trunc_au  (outer-radius clip for gridding)
+			0.08,          # channel_spacing (km/s)
+			np.deg2rad(-50),# inclination [radians]; sign matters only for sin/cos use
+			-1.0,           # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
+			False          # clip_13co radius or False
+		))
+		_register_target(discname, vmax=0.3)
+
+		target_list = [discname] # ELS: this one after the final appended target only, or you won't get all of them
+
+	# --------------------------------------------------------------------------------------------------------
 
 	if 'testgrid' in target_list and not args.parfile:
 		grid_files = sorted(glob.glob("**/azimuthal_velocity_residuals_incl*deg_PA*deg_xc*_yc*.txt", recursive=True))

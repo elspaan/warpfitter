@@ -1,0 +1,31 @@
+#!/bin/bash
+#SBATCH --job-name=fit_mwc758
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=aizquierdocartag@ufl.edu
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem-per-cpu=2gb
+#SBATCH --time=04:00:00
+#SBATCH --partition=hpg-default
+#SBATCH --output=fit_%j.log
+#SBATCH --qos=jbae
+
+i=$1
+W=$2
+S=$3
+bflag=$4
+tag_out=$5
+disk="MWC758v2"
+
+echo "===== Running fit_mc_${disk}_warped.py for iteration $i ====="
+python -W ignore fit_mc_${disk}_warped.py -b $bflag -runid $i -nwalkers $W -nsteps $S -tag $tag_out 2> fit_error.log
+
+
+# Check for FileNotFoundError #Can happen when the run is out of sync and the log_pars of the current iteration is not found
+if grep -q "FileNotFoundError" fit_error.log; then
+    echo "[ERROR] FileNotFoundError detected, killing job $SLURM_JOB_ID"
+    exit 1
+fi
+
+echo "===== Fit finished for iteration $i ====="

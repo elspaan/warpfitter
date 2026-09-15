@@ -1,0 +1,49 @@
+#!/bin/bash
+#SBATCH --job-name=prep_mwc758
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=aizquierdocartag@ufl.edu
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=500mb
+#SBATCH --time=00:10:00
+#SBATCH --partition=hpg-default
+#SBATCH --output=prep_%j.log
+#SBATCH --qos=jbae
+
+i=$1
+W=$2
+S=$3
+bflag=$4
+logpars=$5
+tag_out=$6
+tsteps=$(( S * i ))
+disk="MWC758v2" # match with submit_all_iters.sh
+
+echo "===== Prep for iteration $i ====="
+
+# remove old stuff and make directory again
+rm warp_profile.txt
+rm -rf velocity_residuals/azimuthal_velocity_residuals_${disk}
+mkdir -p velocity_residuals/azimuthal_velocity_residuals_${disk}
+
+# remake parfile with specified logpars file
+# remake channels and -mb convolve by beam??? I don't know if I should??? Defaults to -1 so I can probs also change it to that...
+# make moment maps --> change to 2D for higher inc
+# make azimuthal velocity residuals: why not use native grid (ig) - type = residuals - writ to txt (defaults to 1 anyway) - don't show output
+# move text file to correct folder
+discminer parfile -r 1 -o 1 -f ${logpars}
+discminer channels -mb -1 -so 0
+discminer moments1d -k gaussian 
+discminer azimprof -ig 1 -t residuals -w 1 -so 0 -k gaussian # gaussian kernel
+mv azimuthal_velocity_residuals_${disk}.txt velocity_residuals/azimuthal_velocity_residuals_${disk}/
+
+# run warp fitter with the new logpars and azimuthal residuals
+python warp_fitter.py --warp --grid --parfile --fitplots --residual --target ${disk}
+
+# copy results from residuals folder to parent folder
+# rename said results (generic warp_profile.txt) to specific iteration, etc. 
+cp velocity_residuals/azimuthal_velocity_residuals_${disk}/warp_profile.txt ./warp_profile.txt
+cp warp_profile.txt warp_profile_${tag_out}_cube_${W}walkers_${tsteps}steps.txt
+
+echo "===== Prep done for iteration $i ====="

@@ -121,6 +121,13 @@ def interpolate_to_uniform_azimuth(fname, phi_highres= np.linspace(-np.pi, np.pi
 	for row in data:
 		radius = float(row[0])
 
+		# ***************
+		breakpoint()
+		# ELS & JPeG radii not corrupt here...
+		# Edit: they are, but origins is in azimuthal_velocit_residuals.txt
+		# final entry is at radius 100 AU --> gets sorted at end of this function --> enters radii
+		# ***************
+
 
 		phi = np.array(row[1].split(','), dtype=float)*np.pi/180.0
 		dv = np.array(row[2].split(','), dtype=float)
@@ -162,6 +169,8 @@ def interpolate_to_uniform_azimuth(fname, phi_highres= np.linspace(-np.pi, np.pi
 
 	# Ensure sorted
 	radii_sort_idx = np.argsort(radii)
+
+	# BUG: 
 	radii = radii[radii_sort_idx]
 	dv_grid = dv_grid[radii_sort_idx, :]
 
