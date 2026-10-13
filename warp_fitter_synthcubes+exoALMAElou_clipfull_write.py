@@ -2581,7 +2581,7 @@ if __name__=='__main__':
 		outerbound = 1.0 * best["intensity"]["Rout"] # ELS: change this if I want to change outer disk clip
 		header = fits.getheader(meta["file_data"])
 		# bsize = 0.2 * header["BMAJ"] * 3600  # For radial binning
-		bsize = header["BMAJ"] * 3600 # ELS: beam FWHM in arcsec; binning at beam width, not 1/5th of the beam. Checks out with Andrew's hardcoded bsizes in the target list.
+		bsize = beam_frac * header["BMAJ"] * 3600 # ELS: beam FWHM in arcsec; binning at beam width, not 1/5th of the beam. Checks out with Andrew's hardcoded bsizes in the target list.
 		chansp = np.abs(header["CDELT3"])  # Assumed in km/s
 
 		# ELS: not relevant for warpfitter vanilla
