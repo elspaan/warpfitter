@@ -122,7 +122,7 @@ def interpolate_to_uniform_azimuth(fname, phi_highres= np.linspace(-np.pi, np.pi
 		radius = float(row[0])
 
 		# ***************
-		breakpoint()
+		# breakpoint()
 		# ELS & JPeG radii not corrupt here...
 		# Edit: they are, but origins is in azimuthal_velocit_residuals.txt
 		# final entry is at radius 100 AU --> gets sorted at end of this function --> enters radii

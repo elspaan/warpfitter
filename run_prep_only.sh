@@ -18,7 +18,7 @@ bflag=$4
 logpars=$5
 tag_out=$6
 tsteps=$(( S * i ))
-disk="diskv2" # disk name as per the outtag in fit_mc_<disk>_warped.py; match velocity residuals folder
+disk="<diskv2>" # disk name as per the outtag in fit_mc_<disk>_warped.py; match velocity residuals folder
 
 echo "===== Prep for iteration $i ====="
 
@@ -35,15 +35,22 @@ mkdir -p velocity_residuals/azimuthal_velocity_residuals_${disk}
 discminer parfile -r 1 -o 1 -f ${logpars}
 discminer channels -mb -1 -so 0
 
-discminer moments1d -k gaussian # gaussian kernel
+# gaussian - synthcubes incl10 + incl30; MWC758
+discminer moments1d -k gaussian 
 discminer azimprof -ig 1 -t residuals -w 1 -so 0 -k gaussian 
-# discminer moments1d -k bell # bell kernel
-# discminer azimprof -ig 1 -t residuals -w 1 -so 0 -k bell # bell kernel
+
+# bell - J1604
+# discminer moments1d -k bell 
+# discminer azimprof -ig 1 -t residuals -w 1 -so 0 -k bell 
+
+# doublebell - synthcubes incl50
+# discminer moments2d -k dbell 
+# discminer azimprof -ig 1 -t residuals -w 1 -so 0 -k dbell 
 
 mv azimuthal_velocity_residuals_${disk}.txt velocity_residuals/azimuthal_velocity_residuals_${disk}/
 
 # run warp fitter with the new logpars and azimuthal residuals
-python warp_fitter_synthcubes+exoALMAElou_clipexp.py --warp --grid --parfile --fitplots --residual --target ${disk}
+python warp_fitter_synthcubes+exoALMAElou_clip_write.py --warp --grid --parfile --fitplots --residual --target ${disk}
 
 # copy results from residuals folder to parent folder
 # rename said results (generic warp_profile.txt) to specific iteration, etc. 

@@ -16,10 +16,10 @@ W=$2
 S=$3
 bflag=$4
 tag_out=$5
-disk="diskv2" # disk name as per the outtag in fit_mc_<disk>_warped.py
+disk="<diskv2>" # disk name as per the outtag in fit_mc_<disk>_warped.py
 
-echo "===== Running fit_mc_${disk}_warped.py for iteration $i ====="
-python -W ignore fit_mc_${disk}_warped.py -b $bflag -runid $i -nwalkers $W -nsteps $S -tag $tag_out 2> fit_error.log
+echo "===== Running fit_mc_${disk}_warped_inc0fixed.py for iteration $i ====="
+python -W ignore fit_mc_${disk}_warped_inc0fixed.py -b $bflag -runid $i -nwalkers $W -nsteps $S -tag $tag_out 2> fit_error.log
 
 
 # Check for FileNotFoundError #Can happen when the run is out of sync and the log_pars of the current iteration is not found
