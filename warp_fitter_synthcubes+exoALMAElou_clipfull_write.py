@@ -387,8 +387,8 @@ def fit_gp_from_warp_model(
 
 	beam_fwhm_arcsec = meta_params.get("beam_fwhm_arcsec", 0.15)
 	distance_pc = meta_params.get("dist_pc", 100.0)
-	beam_radius_au = beam_fwhm_arcsec * distance_pc
-	#print(beam_radius_au)
+	beam_fwhm_au = beam_fwhm_arcsec * distance_pc
+	#print(beam_fwhm_au)
 
 
 	if clip:
@@ -398,7 +398,7 @@ def fit_gp_from_warp_model(
 
 	# ELS: experimental R_mask for inner disk.
 	# - Claude -------------------------------
-	inner_mask = rgrid >= r0 + beam_frac * beam_radius_au
+	inner_mask = rgrid >= r0 + beam_frac * beam_fwhm_au
 	dv_grid = dv_grid[inner_mask]
 	rgrid = rgrid[inner_mask]
 
@@ -406,7 +406,7 @@ def fit_gp_from_warp_model(
 	# treating beam-correlated radii as independent in downstream chi-square
 	if one_per_beam and len(rgrid) > 1:
 		dr_native = np.median(np.diff(rgrid))
-		nskip_r = max(1, int(round(beam_radius_au / dr_native)))
+		nskip_r = max(1, int(round(beam_fwhm_au / dr_native)))
 		rgrid = rgrid[::nskip_r]
 		dv_grid = dv_grid[::nskip_r]
 		if len(rgrid) < 5:
@@ -430,7 +430,7 @@ def fit_gp_from_warp_model(
 
 	for i, r in enumerate(rgrid):
 		# ELS: get rid of loop if above mask clip works
-		# if r>=r0+2*beam_frac*beam_radius_au:
+		# if r>=r0+2*beam_frac*beam_fwhm_au:
 		dv = rot_sign * dv_grid[i]
 		mask = np.abs(dv) < dv_max
 
@@ -444,7 +444,7 @@ def fit_gp_from_warp_model(
 		
 		# ELS: adjust beam mask here
 		# set to two beams
-		nbeams = 2.*np.pi*r/beam_radius_au
+		nbeams = 2.*np.pi*r/beam_fwhm_au
 
 		nskip =1
 		if nbeams<int(np.sum(mask)):
@@ -505,12 +505,12 @@ def fit_gp_from_warp_model(
 	# Determine beam size in AU
 	beam_fwhm_arcsec = meta_params.get("beam_fwhm_arcsec", 0.15)
 	distance_pc = meta_params.get("dist_pc", 100.0)
-	beam_radius_au = beam_fwhm_arcsec * distance_pc
+	beam_fwhm_au = beam_fwhm_arcsec * distance_pc
 
 	# Beam-based radial sampling
 	r_min, r_max = np.min(rgrid), np.max(rgrid)
-	r_fit = np.arange(r_min, r_max + beam_radius_au/2., beam_radius_au/2.)
-	#r_fit = np.arange(r_min, r_max + beam_radius_au, beam_radius_au)
+	r_fit = np.arange(r_min, r_max + beam_fwhm_au/2., beam_fwhm_au/2.)
+	#r_fit = np.arange(r_min, r_max + beam_fwhm_au, beam_fwhm_au)
 
 	# Interpolate delta_i, delta_pa, and their errors to r_fit
 	interp_i = interp1d(rgrid, delta_i_obs, bounds_error=False, fill_value=(delta_i_obs[0], delta_i_obs[-1]))
@@ -524,8 +524,8 @@ def fit_gp_from_warp_model(
 	pa_err = interp_pa_err(r_fit)
 
 	# GP kernel (can be adjusted later if needed)
-	kernel_i = C(1.0) * Matern(length_scale=beam_radius_au*2., nu=2.5) # + WhiteKernel(noise_level=i_err)
-	kernel_pa = C(1.0) * Matern(length_scale=beam_radius_au*2., nu=2.5)# + WhiteKernel(noise_level=pa_err)
+	kernel_i = C(1.0) * Matern(length_scale=beam_fwhm_au*2., nu=2.5) # + WhiteKernel(noise_level=i_err)
+	kernel_pa = C(1.0) * Matern(length_scale=beam_fwhm_au*2., nu=2.5)# + WhiteKernel(noise_level=pa_err)
 
 	# Convert errors to variances
 	alpha_i = i_err**2
@@ -850,8 +850,8 @@ def plot_combined_velocity_and_profiles(
 		ax.set_aspect('equal')
 		beam_fwhm_arcsec = meta_params.get("beam_fwhm_arcsec", 0.15)
 		distance_pc = meta_params.get("dist_pc", 100.0)
-		beam_radius_au = 1.0 * beam_fwhm_arcsec * distance_pc # ELS: I want just one beam
-		beam_circle = Circle((0, 0), radius=beam_frac*beam_radius_au,
+		beam_fwhm_au = 1.0 * beam_fwhm_arcsec * distance_pc # ELS: I want just one beam
+		beam_circle = Circle((0, 0), radius=beam_frac*beam_fwhm_au,
 								facecolor='gray', edgecolor='red', alpha=0.95,
 								zorder=10)
 		ax.add_patch(beam_circle)
@@ -928,7 +928,7 @@ def plot_combined_velocity_and_profiles(
 			ax_resid.set_ylabel("")
 			for spine in ax_resid.spines.values():
 				spine.set_visible(False)
-			beam_circle = Circle((0, 0), radius=beam_frac*beam_radius_au,
+			beam_circle = Circle((0, 0), radius=beam_frac*beam_fwhm_au,
 									facecolor='gray', edgecolor='red', alpha=0.95,
 									zorder=10)
 			ax_resid.add_patch(beam_circle)
@@ -2578,9 +2578,10 @@ if __name__=='__main__':
 		inclpar = best["orientation"]["incl"]
 		mstarpar = best["velocity"]["Mstar"]
 		velsignpar = best["velocity"]["vel_sign"]
-		outerbound = 0.95 * best["intensity"]["Rout"] # ELS: change this if I want to change outer disk clip
+		outerbound = 1.0 * best["intensity"]["Rout"] # ELS: change this if I want to change outer disk clip
 		header = fits.getheader(meta["file_data"])
-		bsize = 0.2 * header["BMAJ"] * 3600  # For radial binning
+		# bsize = 0.2 * header["BMAJ"] * 3600  # For radial binning
+		bsize = header["BMAJ"] * 3600 # ELS: beam FWHM in arcsec; binning at beam width, not 1/5th of the beam. Checks out with Andrew's hardcoded bsizes in the target list.
 		chansp = np.abs(header["CDELT3"])  # Assumed in km/s
 
 		# ELS: not relevant for warpfitter vanilla
@@ -2599,7 +2600,7 @@ if __name__=='__main__':
 			subprocess.run("discminer channels -mb 1 -so 0", shell=True, check=True)
 			subprocess.run("discminer moments1d", shell=True, check=True)
 			subprocess.run(
-				"discminer azimprof -i 0.2 -o 0.95 -ig 1 -t residuals -w 1 -so 0",
+				"discminer azimprof -i 0.2 -o 0.98 -ig 1 -t residuals -w 1 -so 0",
 				shell=True,
 				check=True,
 			)
@@ -2793,9 +2794,9 @@ if __name__=='__main__':
 			155.9,           # dist_pc         (distance in pc)
 			0.15,           # beam_fwhm_arcsec
 			1.738778,           # mstar_norm      (M_★ in solar units)
-			250,          # R_out_trunc_au  (outer-radius clip for gridding)
+			270,          # R_out_trunc_au  (outer-radius clip for gridding)
 			0.08,           # channel_spacing (km/s)
-			-0.297595,# inclination [radians]; sign matters only for sin/cos use
+			np.deg2rad(-19.4),# inclination [radians]; sign matters only for sin/cos use
 			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
 			False           # clip_13co radius or False
 		))
@@ -2811,9 +2812,9 @@ if __name__=='__main__':
 			155.9,           # dist_pc         (distance in pc)
 			0.15,           # beam_fwhm_arcsec
 			2.084179,           # mstar_norm      (M_★ in solar units)
-			250,          # R_out_trunc_au  (outer-radius clip for gridding)
+			270,          # R_out_trunc_au  (outer-radius clip for gridding)
 			0.08,           # channel_spacing (km/s)
-			-0.286327,	# inclination [radians]; sign matters only for sin/cos use
+			np.deg2rad(-19.4),	# inclination [radians]; sign matters only for sin/cos use
 			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
 			False           # clip_13co radius or False
 		))
@@ -2830,7 +2831,7 @@ if __name__=='__main__':
 			167,           # dist_pc         (distance in pc)
 			0.15,           # beam_fwhm_arcsec
 			1.61,           # mstar_norm      (M_★ in solar units)
-			180,          # R_out_trunc_au  (outer-radius clip for gridding)
+			np.inf,          # R_out_trunc_au  (outer-radius clip for gridding)
 			0.08,           # channel_spacing (km/s)
 			np.deg2rad(-20),# inclination [radians]; sign matters only for sin/cos use
 			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
@@ -2848,7 +2849,7 @@ if __name__=='__main__':
 			167,           # dist_pc         (distance in pc)
 			0.15,           # beam_fwhm_arcsec
 			1.61,           # mstar_norm      (M_★ in solar units)
-			180,          # R_out_trunc_au  (outer-radius clip for gridding)
+			np.inf,          # R_out_trunc_au  (outer-radius clip for gridding)
 			0.08,           # channel_spacing (km/s)
 			np.deg2rad(-20),# inclination [radians]; sign matters only for sin/cos use
 			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
@@ -2866,7 +2867,7 @@ if __name__=='__main__':
 			145,           # dist_pc         (distance in pc)
 			0.15,           # beam_fwhm_arcsec
 			1.29,           # mstar_norm      (M_★ in solar units)
-			270,          # R_out_trunc_au  (outer-radius clip for gridding)
+			np.inf,          # R_out_trunc_au  (outer-radius clip for gridding)
 			0.08,           # channel_spacing (km/s)
 			np.deg2rad(6),# inclination [radians]; sign matters only for sin/cos use
 			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
@@ -2884,7 +2885,7 @@ if __name__=='__main__':
 			145,           # dist_pc         (distance in pc)
 			0.15,           # beam_fwhm_arcsec
 			1.29,           # mstar_norm      (M_★ in solar units)
-			270,          # R_out_trunc_au  (outer-radius clip for gridding)
+			np.inf,          # R_out_trunc_au  (outer-radius clip for gridding)
 			0.08,           # channel_spacing (km/s)
 			np.deg2rad(6),# inclination [radians]; sign matters only for sin/cos use
 			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
@@ -2902,7 +2903,7 @@ if __name__=='__main__':
 			145,           # dist_pc         (distance in pc)
 			0.15,           # beam_fwhm_arcsec
 			1.29,           # mstar_norm      (M_★ in solar units)
-			270,          # R_out_trunc_au  (outer-radius clip for gridding)
+			np.inf,          # R_out_trunc_au  (outer-radius clip for gridding)
 			0.08,           # channel_spacing (km/s)
 			np.deg2rad(6),# inclination [radians]; sign matters only for sin/cos use
 			1.0,            # rot_sign        (+1 if clockwise on the sky, −1 otherwise)
